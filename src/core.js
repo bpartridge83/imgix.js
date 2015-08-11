@@ -1141,8 +1141,18 @@ imgix.setGradientOnElement = function (el, colors, baseColor) {
 imgix.URL = function (url, imgParams, token) {
 
   this.token = token || imgix.token;
+  this.domain = imgix.domain;
   this._autoUpdateSel = null;
   this._autoUpdateCallback = null;
+
+  if (this.domain) {
+
+    if (this.domain.slice(-1) !== '/') {
+      this.domain += '/';
+    }
+
+    url = this.domain + url;
+  }
 
   if (url && url.slice(0, 2) === '//' && window && window.location) {
     url = window.location.protocol + url;
@@ -1215,6 +1225,15 @@ imgix.URL.prototype.attachImageTo = function (elemOrSel, callback) {
  */
 imgix.URL.prototype.setToken = function (token) {
   this.token = token;
+};
+
+/**
+ * Set the domain for generating URLs. If a domain is set it will always use the domain for building URLs
+ * @memberof imgix
+ * @param {string} root domain for imgix-rendered files
+ */
+imgix.URL.prototype.setDomain = function (domain) {
+  this.domain = domain;
 };
 
 imgix.createParamString = function () {
@@ -1475,8 +1494,6 @@ imgix.URL.prototype.toString = function () {
  */
 imgix.URL.prototype.getUrl = function () {
   var url = imgix.buildUrl(this.urlParts);
-
-  console.log(this.token);
 
   if (this.token) {
     return imgix.signUrl(url, this.token);
@@ -1891,6 +1908,10 @@ imgix.buildUrl = function (parsed) {
 
 imgix.setToken = function (token) {
   this.token = token;
+}
+
+imgix.setDomain = function (domain) {
+  this.domain = domain;
 }
 
 imgix.signUrl = function (newUrl, token) {
