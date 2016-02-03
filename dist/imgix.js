@@ -1,4 +1,4 @@
-/*! http://www.imgix.com imgix.js - v1.1.2 - 2015-08-11 
+/*! http://www.imgix.com imgix.js - v1.1.2 - 2016-02-02 
  _                    _             _
 (_)                  (_)           (_)
  _  _ __ ___    __ _  _ __  __      _  ___
@@ -2525,7 +2525,7 @@ imgix.FluidSet.prototype.updateSrc = function (elem, pinchScale) {
   }
 
   var details = this.getImgDetails(elem, pinchScale || 1),
-    newUrl = details.url,
+    newUrl = imgix.signUrl(details.url),
     currentElemWidth = details.width,
     currentElemHeight = details.height;
 
