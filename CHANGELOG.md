@@ -1,3 +1,69 @@
+# new imgix.js 2.1.0
+
+## Features
+
+* Removed unnecessary `imgix.getRawBackgroundImage` method.
+
+## Bug Fixes
+
+* Fixed a bug in `imgix.getBackgroundImage` that was failing to return a proper background-image URL in some corner cases.
+
+
+## Bug Fixes
+
+* Removing parameter-specific getters and setters removes a load of bugs related to various image API parameters throwing validation warnings when constructing and manipulating imgix URLs.
+
+# new imgix.js 2.0.0
+
+## Features
+
+* Removed all parameter-specific getters and setters from the `imgix.URL` object (i.e. `imgix.URL.getSepia()`, `imgix.URL.setWidth()`, et cetera). Instead, you should use `imgix.URL.getParam()` and `imgix.URL.setParam()`.
+* Removed all methods for listing and sorting image parameters, as they were frequently out of date: `imgix.getAllParams()`, `imgix.getParamAliases()`, `imgix.getDefaultParamValues()`, `imgix.getDefaultParamValue()`, `imgix.getDefaultParams()`.
+* Also removed all methods related to font lookups, including `imgix.getFontLookup()`, `imgix.getFonts()`, `imgix.searchFonts()`, and `imgix.isFontAvailable()`.
+* Removed checks when constructing and manipulating imgix URLs that previously validated parameters names and values.
+* Renamed `imgix.helpers.getDPR()` method to `imgix.helpers.getWindowDPR()`
+
+## Bug Fixes
+
+* Removing parameter-specific getters and setters removes a load of bugs related to various image API parameters throwing validation warnings when constructing and manipulating imgix URLs.
+
+
+# new imgix.js 1.2.0
+
+## Features
+
+* Updated `imgix.URL.getColors()` method to use simple AJAX instead of CSS-injection. As a result of this, colors are being returned from lightest to darkest, rather than from darkest to lightest as they were previously. This change was made to bring the behavior of this method in line with the `palette=json` image API, which it now uses.
+* Removed several unnecessary polyfills, shaving 4KB off of the minified file size.
+
+## Bug Fixes
+
+* Continuous integration tests are now being done against the library both with and without polyfills.
+
+
+# new imgix.js 1.1.4
+
+## Features
+
+* Broke core.js up into separate components
+* Broke tests up into different files
+
+## Bug Fixes
+
+* Fixed a bug in `imgix.buildUrl()` that was causing port numbers to be ignored
+* Fixed a bug where `imgix.fluid()` would ignore the `crossorigin` attribute on its targets
+
+
+# new imgix.js 1.1.3
+
+## Features
+
+N/A
+
+## Bug Fixes
+
+* Optimized scroll-handing when using `lazyLoad` property of `imgix.fluid()`.
+
+
 # new imgix.js 1.1.2
 
 ## Features

@@ -84,6 +84,13 @@ module.exports = function(grunt) {
 					srcPath('prefix.js'),
 					srcPath('polyfills.js'),
 					buildPath('core.js'),
+					srcPath('params.js'),
+					srcPath('helpers.js'),
+					srcPath('url.js'),
+					srcPath('fluid.js'),
+					srcPath('onready.js'),
+					srcPath('colors.js'),
+					srcPath('xpath.js'),
 					srcPath('suffix.js')
 				],
 				dest: jsFile
@@ -93,6 +100,13 @@ module.exports = function(grunt) {
 				src: [
 					srcPath('prefix.js'),
 					buildPath('core.js'),
+					srcPath('params.js'),
+					srcPath('helpers.js'),
+					srcPath('url.js'),
+					srcPath('fluid.js'),
+					srcPath('onready.js'),
+					srcPath('colors.js'),
+					srcPath('xpath.js'),
 					srcPath('suffix.js')
 				],
 				dest: jsFile
@@ -115,6 +129,10 @@ module.exports = function(grunt) {
 
 			unitquick: {
 				configFile: 'karma-quick.conf.js'
+			},
+
+			ci: {
+				configFile: 'karma-travis.conf.js'
 			}
 		},
 
@@ -123,10 +141,10 @@ module.exports = function(grunt) {
 				src: "dist/imgix.js",
 				dest: docsApiFile,
 				options: {
-					index: false
+					index: false,
+					"sort-by": "name"
 				}
 			}
-
 		},
 
     jshint: {
@@ -145,8 +163,6 @@ module.exports = function(grunt) {
       }
 	});
 
-	grunt.registerTask('prebuild', ['copy-core', 'build-dynamic-method-docs']);
-
 	grunt.registerTask('copy-core', '', function() {
 		if (grunt.file.exists(buildDir)) {
 			grunt.file.delete(buildDir);
@@ -155,16 +171,9 @@ module.exports = function(grunt) {
 		fileCopy(srcPath('core.js'), buildDir);
 	});
 
-	grunt.registerTask('test', 'run tests', function() {
-		var configPath = path.join(__dirname, '/tests/config.js');
-		if (!fs.existsSync(configPath)) {
-			throw grunt.util.error("\n\nconfig.js does not exist. Required for tests! (signing)\n");
-		} else {
-			grunt.task.run(['build', 'karma']);
-		}
-	});
-
+	grunt.registerTask('test', ['build', 'karma:unit']);
 	grunt.registerTask('test:quick', ['build', 'karma:unitquick']);
+	grunt.registerTask('test:travis', ['build', 'karma:ci']);
 
 	grunt.registerTask('doc-cleanup', 'clean up output', function() {
 		var contents = fs.readFileSync(docsApiFile, 'UTF-8');
@@ -183,46 +192,15 @@ module.exports = function(grunt) {
 		fs.writeFileSync(docsApiFile, contents);
 	});
 
-	grunt.registerTask('build-dynamic-method-docs', 'build jsdocs for the dynamically built methods', function() {
-
-		if (!grunt.file.exists(distPath('imgix.js'))) {
-			console.log("dist/imgix.js does not exist. build again for auto generating docs");
-			return;
-		}
-		var imgix = require('./dist/imgix.js').imgix,
-			compiledSet = _.template("/**\n\tApply the \"<%= param %>\" imgix param to the image url. Same as doing .setParam('<%= param %>', val)\n\t@param val the value to set for <%= param %>\n\t@name imgix.URL#set<%= pretty %>\n\t@function\n*/"),
-
-			compiledGet = _.template("/**\n\tGet the value of the \"<%= param %>\" imgix param currently on the image url. Same as doing .getParam('<%= param %>')\n\t@name imgix.URL#get<%= pretty %>\n\t@function\n*/"),
-
-			getDocs = [],
-			setDocs = [];
-
-		for (var param in imgix.URL.theGetSetFuncs) {
-			(function(tmp) {
-				var pretty = imgix.URL.theGetSetFuncs[tmp];
-
-				setDocs.push(compiledSet({pretty: pretty, param: tmp}));
-				getDocs.push(compiledGet({pretty: pretty, param: tmp}));
-			})(param);
-		}
-
-		var coreContents = fs.readFileSync(buildPath('core.js'), 'UTF-8');
-
-		coreContents += "\n\n" + setDocs.join("\n\n") + getDocs.join("\n\n");
-
-		fs.writeFileSync(buildPath('core.js'), coreContents);
-
-	});
-
 	grunt.registerTask('builddocs', 'build the docs', function() {
 		grunt.task.run(['build', 'jsdoc2md', 'doc-cleanup']);
 	});
 
 	grunt.registerTask('build', 'build everything', function() {
 		if (noPolyfills) {
-			grunt.task.run(['prebuild', 'concat:nopolyjs', 'uglify']);
+			grunt.task.run(['copy-core', 'concat:nopolyjs', 'uglify']);
 		} else {
-			grunt.task.run(['prebuild', 'concat:js', 'uglify']);
+			grunt.task.run(['copy-core', 'concat:js', 'uglify']);
 		}
 	});
 
