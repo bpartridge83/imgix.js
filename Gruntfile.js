@@ -91,7 +91,8 @@ module.exports = function(grunt) {
 					srcPath('onready.js'),
 					srcPath('colors.js'),
 					srcPath('xpath.js'),
-					srcPath('suffix.js')
+					srcPath('suffix.js'),
+					srcPath('md5.js')
 				],
 				dest: jsFile
 			},
@@ -107,7 +108,8 @@ module.exports = function(grunt) {
 					srcPath('onready.js'),
 					srcPath('colors.js'),
 					srcPath('xpath.js'),
-					srcPath('suffix.js')
+					srcPath('suffix.js'),
+					srcPath('md5.js')
 				],
 				dest: jsFile
 			},

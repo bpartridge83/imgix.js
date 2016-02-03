@@ -7,10 +7,19 @@
  * @param {string} url An imgix url to start with (optional)
  * @param {object} imgParams imgix query string params (optional)
  */
-imgix.URL = function (url, imgParams) {
-
+imgix.URL = function (url, imgParams, token) {
+  this.token = token || imgix.token;
+  this.domain = imgix.domain;
   this._autoUpdateSel = null;
   this._autoUpdateCallback = null;
+
+  if (this.domain) {
+    if (this.domain.slice(-1) !== '/') {
+      this.domain += '/';
+    }
+
+    url = this.domain + url;
+  }
 
   if (url && url.slice(0, 2) === '//' && window && window.location) {
     url = window.location.protocol + url;
@@ -74,6 +83,51 @@ imgix.URL.prototype.attachImageTo = function (elemOrSel, callback) {
   } else {
     imgix.setElementImageAfterLoad(elemOrSel, this.getUrl(), callback);
   }
+};
+
+/**
+ * Set the token for signing images. If a token is set it will always sign the generated urls
+ * @memberof imgix
+ * @param {string} token secure url token from your imgix source
+ */
+imgix.URL.prototype.setToken = function (token) {
+  this.token = token;
+};
+
+/**
+ * Set the domain for generating URLs. If a domain is set it will always use the domain for building URLs
+ * @memberof imgix
+ * @param {string} root domain for imgix-rendered files
+ */
+imgix.URL.prototype.setDomain = function (domain) {
+  this.domain = domain;
+};
+
+imgix.setToken = function (token) {
+  this.token = token;
+};
+
+imgix.setDomain = function (domain) {
+  this.domain = domain;
+};
+
+imgix.signUrl = function (newUrl, token) {
+  token = token || this.token;
+
+  if (token) {
+    var parts = imgix.parseUrl(newUrl),
+      toSign = token + parts.pathname + '?' + parts.search,
+      sig = imgix.md5(token + parts.pathname + '?' + parts.search);
+
+    if (newUrl.indexOf('?') === -1) {
+      sig = imgix.md5(token + parts.pathname);
+      newUrl = newUrl + '?s=' + sig;
+    } else {
+      newUrl = newUrl + '&s=' + sig;
+    }
+  }
+
+  return newUrl;
 };
 
 imgix.createParamString = function () {
@@ -318,6 +372,10 @@ imgix.URL.prototype.toString = function () {
  */
 imgix.URL.prototype.getUrl = function () {
   var url = imgix.buildUrl(this.urlParts);
+
+  if (this.token) {
+    url = imgix.signUrl(url, this.token);
+  }
 
   if (!url || url.length === 0) {
     return imgix.getEmptyImage();

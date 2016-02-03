@@ -63,7 +63,7 @@ imgix.FluidSet.prototype.updateSrc = function (elem, pinchScale) {
   }
 
   var details = this.getImgDetails(elem, pinchScale || 1),
-    newUrl = details.url,
+    newUrl = imgix.signUrl(details.url),
     currentElemWidth = details.width,
     currentElemHeight = details.height;
 
